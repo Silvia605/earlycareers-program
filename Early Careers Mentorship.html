@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Early Careers Mentorship</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f5f3f0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            gap: 30px;
+        }
+
+        .profile-section {
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 30px;
+        }
+
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-color: #e0ddd8;
+            border: 4px solid #800020;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .profile-section:hover .upload-overlay {
+            opacity: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .title {
+            color: #800020;
+            font-size: 3.5rem;
+            font-weight: normal;
+            letter-spacing: -1px;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            color: #5a5a5a;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            font-family: inherit;
+        }
+
+        .section {
+            background-color: rgba(255,255,255,0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid rgba(200,200,200,0.3);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #2c2c2c;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .contact-label {
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+
+        .contact-link {
+            padding: 8px 0;
+            color: #800020;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .contact-link:hover {
+            color: #600018;
+            text-decoration: underline;
+        }
+
+        .programs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .program-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .program-header {
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .kickstart-header { 
+            background-color: #8AB6F9; 
+            color: white;
+        }
+        .focus-header { 
+            background-color: #4A90E2; 
+            color: white;
+        }
+        .pathway-header { 
+            background-color: #1E5AA8; 
+            color: white;
+        }
+        .horizon-header { 
+            background-color: #00246B; 
+            color: white;
+        }
+
+        .program-content {
+            padding: 0;
+        }
+
+        .program-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .program-row:last-child {
+            border-bottom: none;
+        }
+
+        .row-label {
+            padding: 12px 15px;
+            background-color: #f7fafc;
+            font-weight: bold;
+            color: #4a5568;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+        }
+
+        .row-text {
+            padding: 12px 15px;
+            font-size: 14px;
+            min-height: 45px;
+            font-family: inherit;
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+
+        .row-text.block {
+            padding: 12px 15px;
+        }
+
+        .session-title {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            color: #2c2c2c;
+        }
+
+        .session-title:first-child {
+            margin-top: 0;
+        }
+
+        .download-section {
+            text-align: center;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: #6b7280;
+            background-color: #f5f5f5;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #3182ce;
+            background-color: #e6f3ff;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e6f7ff;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .download-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3182ce;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-link:hover {
+            background-color: #2c5aa0;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+            }
+
+            .profile-section {
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            .profile-pic {
+                width: 150px;
+                height: 150px;
+            }
+
+            .upload-overlay {
+                width: 150px;
+                height: 150px;
+            }
+
+            .title {
+                font-size: 2.5rem;
+            }
+
+            .programs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .contact-label {
+                margin-top: 15px;
+            }
+
+            .contact-label:first-child {
+                margin-top: 0;
+            }
+            
+            .program-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .row-label {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="profile-section">
+                <img id="profilePic" class="profile-pic" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiByeD0iNzUiIGZpbGw9IiNlMGRkZDgiLz4KPHN2ZyB4PSI0NSIgeT0iNDAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTk5Ij4KICA8cGF0aCBkPSJNMTIgMTJcbiAgICBjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0eiIgLz4KICA8cGF0aCBkPSJNMTIgMTVjLTMuMzEgMC02IDIuNjktNiA2aDEyYzAtMy4zMS0yLjY5LTYtNi02eiIgLz4KPC9zdmc+Cg==" alt="Upload Profile Picture">
+                <div class="upload-overlay" onclick="document.getElementById('fileInput').click()">
+                    Click to Upload<br>Profile Picture
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+            <div class="header-content">
+                <h1 class="title">Early Careers Mentorship</h1>
+                <div class="description">
+                    I'm Silvia, experienced professional in business analytics & working in international companies in different countries. I provide mentorship for students and graduates to help them enter the job market (any area), Focus & skills assessment for business analytics positions, as well as reviews on CV & cover letters.
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Details Section -->
+        <div class="section">
+            <h2 class="section-title">Contact Details</h2>
+            <div class="contact-grid">
+                <span class="contact-label">📧 Email:</span>
+                <a href="mailto:silvia.gonbla@gmail.com" class="contact-link">silvia.gonbla@gmail.com</a>
+                
+                <span class="contact-label">📅 Calendly:</span>
+                <a href="https://calendly.com/silvs-mentorship" target="_blank" class="contact-link">calendly.com/silvs-mentorship</a>
+            </div>
+        </div>
+
+        <!-- Mentorship Programs Section -->
+        <div class="section">
+            <h2 class="section-title">Mentorship Programs</h2>
+            <div class="programs-grid">
+                <!-- Kickstart -->
+                <div class="program-card">
+                    <div class="program-header kickstart-header">Kickstart | Individual Session</div>
+                    <div class="program-content">
+                        <div class="program-row">
+                            <div class="row-label">Duration</div>
+                            <div class="row-text">30min</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Block</div>
+                            <div class="row-text">Review & assess academic profile
+Review CV & Cover Letter
+Early guidance based on background & student ambitions
+Provide resources (free courses) to improve your skills</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Target</div>
+                            <div class="row-text">High-level session to get a clean presentation as a professional</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Fee</div>
+                            <div class="row-text">25 €</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Focus -->
+                <div class="program-card">
+                    <div class="program-header focus-header">Focus | Individual Session</div>
+                    <div class="program-content">
+                        <div class="program-row">
+                            <div class="row-label">Duration</div>
+                            <div class="row-text">1h</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Block</div>
+                            <div class="row-text">Review & assess academic profile
+Review CV & Cover Letter
+Early guidance based on background & ambitions
+Provide resources (free courses) to improve your skills
+Focus on BA (skills, roles to apply, industry & companies)
+Tackle personalized doubts</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Target</div>
+                            <div class="row-text">Personalized session focused on entering a concrete industry/role</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Fee</div>
+                            <div class="row-text">45 €</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pathway -->
+                <div class="program-card">
+                    <div class="program-header pathway-header">Pathway | 3 Sessions</div>
+                    <div class="program-content">
+                        <div class="program-row">
+                            <div class="row-label">Duration</div>
+                            <div class="row-text">1h (up to the student how to distribute them)</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Block</div>
+                            <div class="row-text block">
+                                <span class="session-title">Session 1 – Diagnosis & CV:</span>
+                                - Detailed evaluation of CV and LinkedIn profile
+                                - Identification of strengths and areas for improvement
+                                - Adjustment of the CV for Business Analytics positions
+
+                                <span class="session-title">Session 2 – Professional Roadmap:</span>
+                                - Explanation of roles in Analytics / Data (BI Analyst, Data Analyst, Market Access Analyst)
+                                - Review of necessary technical skills (Advanced Excel, Power BI, SQL, Python, RStudio)
+                                - Define personalized learning plan tailored to the student's profile
+
+                                <span class="session-title">Session 3 – Interview Preparation:</span>
+                                - Mock interview (technical and business questions)
+                                - Detailed real-time feedback
+                                - How to respond to practical cases (e.g., market analysis, KPIs, data visualization)
+                            </div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Target</div>
+                            <div class="row-text">Student with clear vision & objectives. Focus on deeping into business analytics knowledge & industry</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Fee</div>
+                            <div class="row-text">130 €</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizon -->
+                <div class="program-card">
+                    <div class="program-header horizon-header">Horizon | 5 Sessions</div>
+                    <div class="program-content">
+                        <div class="program-row">
+                            <div class="row-label">Duration</div>
+                            <div class="row-text">1h (up to the student how to distribute them)</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Block</div>
+                            <div class="row-text block">
+                                <span class="session-title">Session 1 – Foundation & Self-Assessment:</span>
+                                Objective: Understand strengths, career goals, and current gaps.
+                                Includes:
+                                - Academic/professional background review
+                                - Identification of transferable skills and areas for growth
+                                - Initial feedback on CV and LinkedIn (high-level)
+                                - Define mentorship goals and roadmap
+
+                                <span class="session-title">Session 2 – CV & LinkedIn Deep Dive:</span>
+                                Objective: Optimize professional presence
+                                Includes:
+                                - Detailed CV review and rewriting tips tailored for Business Analytics roles.
+                                - Guidance on how to highlight analytical projects, internships, or portfolio work.
+                                - Short list of key skills and certifications to emphasize.
+
+                                <span class="session-title">Session 3 – Technical Skills & Portfolio Guidance:</span>
+                                Objective: Build credibility in analytics.
+                                Includes:
+                                - Discussion of core technical skills (Excel, Power BI, SQL, Python basics).
+                                - Review of any existing analytics projects or portfolio work.
+                                - Recommendations for practical exercises or mini-projects to strengthen profile.
+                                - Resources for self-learning or certification paths.
+
+                                <span class="session-title">Session 4 – Interview Prep & Case Practice:</span>
+                                Objective: Prepare student for real-world selection processes
+                                Includes:
+                                - Mock interview (behavioral + technical questions).
+                                - Case study walkthroughs (e.g., analyzing a dataset, KPIs, or market insights).
+                                - Feedback on communication, storytelling, and structuring answers.
+                                - Tips for answering scenario-based questions common in analytics roles.
+
+                                <span class="session-title">Session 5 – Career Strategy & Networking:</span>
+                                Objective: Build a long-term career plan and actionable next steps.
+                                Includes:
+                                - Creating a roadmap for job applications (target roles, companies, regions)
+                                - Networking strategies (LinkedIn outreach, alumni, events)
+                            </div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Target</div>
+                            <div class="row-text">Student actively applying to roles & undergoing hiring processes</div>
+                        </div>
+                        <div class="program-row">
+                            <div class="row-label">Fee</div>
+                            <div class="row-text">210 €</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mentorship Program Downloads Section -->
+        <div class="section">
+            <h2 class="section-title">Mentorship Program</h2>
+            <div class="download-section">
+                <div class="file-upload-area" onclick="document.getElementById('documentUpload').click()" 
+                     ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div class="upload-text">📄 Click here to upload PDF or Excel file</div>
+                    <div class="upload-text" style="font-size: 14px; color: #999;">Or drag and drop your file here</div>
+                </div>
+                <input type="file" id="documentUpload" class="file-input" accept=".pdf,.xlsx,.xls" onchange="handleDocumentUpload(event)">
+                
+                <div id="fileInfo" class="file-info">
+                    <div id="fileName"></div>
+                    <a id="downloadLink" class="download-link" href="#" download style="display: none;">📥 Download File</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFileData = null;
+        let uploadedFileName = '';
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePic').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleDocumentUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFileName = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedFileData = e.target.result;
+                    showFileInfo(file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const uploadArea = event.currentTarget;
+            uploadArea.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.includes('pdf') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    uploadedFileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedFileData = e.target.result;
+                        showFileInfo(file.name);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function showFileInfo(fileName) {
+            const fileInfo = document.getElementById('fileInfo');
+            const fileNameDiv = document.getElementById('fileName');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            fileNameDiv.textContent = `📁 Uploaded: ${fileName}`;
+            downloadLink.href = uploadedFileData;
+            downloadLink.download = fileName;
+            downloadLink.style.display = 'inline-block';
+            fileInfo.style.display = 'block';
+        }
+
+        // Make the profile picture clickable
+        document.getElementById('profilePic').addEventListener('click', function() {
+            document.getElementById('fileInput').click();
+        });
+    </script>
+</body>
+</html>
