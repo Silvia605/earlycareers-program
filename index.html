@@ -391,7 +391,7 @@
         <!-- Header Section -->
         <div class="header">
             <div class="profile-section">
-                <img id="profilePic" class="profile-pic" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiByeD0iNzUiIGZpbGw9IiNlMGRkZDgiLz4KPHN2ZyB4PSI0NSIgeT0iNDAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTk5Ij4KICA8cGF0aCBkPSJNMTIgMTJcbiAgICBjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0eiIgLz4KICA8cGF0aCBkPSJNMTIgMTVjLTMuMzEgMC02IDIuNjktNiA2aDEyYzAtMy4zMS0yLjY5LTYtNi02eiIgLz4KPC9zdmc+Cg==" alt="Upload Profile Picture">
+                <img id="profilePic" class="profile-pic" src="Silvia Gonzalez Blanch.png" alt="Silvia Gonzalez Blanch">
                 <div class="upload-overlay" id="uploadOverlay">
                     Click to Upload<br>Profile Picture
                 </div>
@@ -624,30 +624,10 @@ Tackle personalized doubts</div>
         let uploadedFileData = null;
         let uploadedFileName = '';
 
-        // Check if user is the owner (using a simple password prompt)
-        function checkIfOwner() {
-            const isOwner = localStorage.getItem('isOwner') === 'true';
-            if (!isOwner) {
-                // For demonstration, using a simple prompt. In a real app, use proper authentication
-                const password = prompt('Enter admin password:');
-                if (password === 'admin123') { // Simple password for demo
-                    localStorage.setItem('isOwner', 'true');
-                    return true;
-                }
-                return false;
-            }
-            return true;
-        }
-
         // Initialize page
         function initPage() {
-            // Load saved profile picture
-            const savedProfilePic = localStorage.getItem('profilePic');
-            if (savedProfilePic) {
-                profilePic.src = savedProfilePic;
-            }
-
-            // Load saved file
+            // For GitHub Pages, we'll check if there's a file in localStorage
+            // but this will only work for the admin who uploads it
             const savedFileData = localStorage.getItem('fileData');
             const savedFileName = localStorage.getItem('fileName');
             if (savedFileData && savedFileName) {
@@ -659,13 +639,8 @@ Tackle personalized doubts</div>
                 downloadLink.style.display = 'inline-block';
             }
 
-            // Check if user is owner and show admin controls
-            if (checkIfOwner()) {
-                adminToggle.style.display = 'block';
-            } else {
-                // Disable all editing features for non-owners
-                disableEditing();
-            }
+            // Show admin controls
+            adminToggle.style.display = 'block';
         }
 
         // Enable editing
@@ -695,8 +670,6 @@ Tackle personalized doubts</div>
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     profilePic.src = e.target.result;
-                    // Save to localStorage
-                    localStorage.setItem('profilePic', e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
@@ -750,22 +723,18 @@ Tackle personalized doubts</div>
         }
 
         // Show file info
-        function showFileInfo(fileName) {
-            fileName.textContent = `📁 Uploaded: ${fileName}`;
+        function showFileInfo(name) {
+            fileName.textContent = `📁 Uploaded: ${name}`;
             downloadLink.href = uploadedFileData;
-            downloadLink.download = fileName;
+            downloadLink.download = name;
             downloadLink.style.display = 'inline-block';
         }
 
         // Reset to default
         function resetToDefault() {
             if (confirm('Are you sure you want to reset? This will remove all uploaded files.')) {
-                localStorage.removeItem('profilePic');
                 localStorage.removeItem('fileData');
                 localStorage.removeItem('fileName');
-                
-                // Reset profile picture
-                profilePic.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiByeD0iNzUiIGZpbGw9IiNlMGRkZDgiLz4KPHN2ZyB4PSI0NSIgeT0iNDAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTk5Ij4KICA8cGF0aCBkPSJNMTIgMTJcbiAgICBjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0eiIgLz4KICA8cGF0aCBkPSJNMTIgMTVjLTMuMzEgMC02IDIuNjktNiA2aDEyYzAtMy4zMS0yLjY5LTYtNi02eiIgLz4KPC9zdmc+Cg==";
                 
                 // Reset file info
                 fileName.textContent = "No file uploaded yet";
