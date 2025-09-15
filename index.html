@@ -261,7 +261,6 @@
             padding: 10px;
             background-color: #e6f7ff;
             border-radius: 5px;
-            display: none;
         }
 
         .download-link {
@@ -277,6 +276,54 @@
 
         .download-link:hover {
             background-color: #2c5aa0;
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+        }
+
+        .admin-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #800020;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 24px;
+        }
+
+        .admin-controls {
+            margin-top: 15px;
+        }
+
+        .admin-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            background: #800020;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .admin-btn.reset {
+            background: #d9534f;
         }
 
         @media (max-width: 768px) {
@@ -330,6 +377,12 @@
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
             }
+
+            .admin-panel {
+                top: 70px;
+                right: 10px;
+                left: 10px;
+            }
         }
     </style>
 </head>
@@ -339,10 +392,10 @@
         <div class="header">
             <div class="profile-section">
                 <img id="profilePic" class="profile-pic" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiByeD0iNzUiIGZpbGw9IiNlMGRkZDgiLz4KPHN2ZyB4PSI0NSIgeT0iNDAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTk5Ij4KICA8cGF0aCBkPSJNMTIgMTJcbiAgICBjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0eiIgLz4KICA8cGF0aCBkPSJNMTIgMTVjLTMuMzEgMC02IDIuNjktNiA2aDEyYzAtMy4zMS0yLjY5LTYtNi02eiIgLz4KPC9zdmc+Cg==" alt="Upload Profile Picture">
-                <div class="upload-overlay" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-overlay" id="uploadOverlay">
                     Click to Upload<br>Profile Picture
                 </div>
-                <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleImageUpload(event)">
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
             </div>
             <div class="header-content">
                 <h1 class="title">Early Careers Mentorship</h1>
@@ -526,37 +579,133 @@ Tackle personalized doubts</div>
         <div class="section">
             <h2 class="section-title">Mentorship Program</h2>
             <div class="download-section">
-                <div class="file-upload-area" onclick="document.getElementById('documentUpload').click()" 
-                     ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <div class="file-upload-area" id="fileUploadArea">
                     <div class="upload-text">📄 Click here to upload PDF or Excel file</div>
                     <div class="upload-text" style="font-size: 14px; color: #999;">Or drag and drop your file here</div>
                 </div>
-                <input type="file" id="documentUpload" class="file-input" accept=".pdf,.xlsx,.xls" onchange="handleDocumentUpload(event)">
+                <input type="file" id="documentUpload" class="file-input" accept=".pdf,.xlsx,.xls">
                 
                 <div id="fileInfo" class="file-info">
-                    <div id="fileName"></div>
+                    <div id="fileName">No file uploaded yet</div>
                     <a id="downloadLink" class="download-link" href="#" download style="display: none;">📥 Download File</a>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Admin Controls -->
+    <button class="admin-toggle" id="adminToggle">⚙️</button>
+    <div class="admin-panel" id="adminPanel">
+        <h3>Admin Controls</h3>
+        <div class="admin-controls">
+            <button class="admin-btn" id="enableEditBtn">Enable Editing</button>
+            <button class="admin-btn" id="saveChangesBtn">Save Changes</button>
+            <button class="admin-btn reset" id="resetBtn">Reset to Default</button>
+        </div>
+    </div>
+
     <script>
+        // DOM Elements
+        const profilePic = document.getElementById('profilePic');
+        const uploadOverlay = document.getElementById('uploadOverlay');
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const documentUpload = document.getElementById('documentUpload');
+        const fileName = document.getElementById('fileName');
+        const downloadLink = document.getElementById('downloadLink');
+        const adminToggle = document.getElementById('adminToggle');
+        const adminPanel = document.getElementById('adminPanel');
+        const enableEditBtn = document.getElementById('enableEditBtn');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // State
+        let editingEnabled = false;
         let uploadedFileData = null;
         let uploadedFileName = '';
 
+        // Check if user is the owner (using a simple password prompt)
+        function checkIfOwner() {
+            const isOwner = localStorage.getItem('isOwner') === 'true';
+            if (!isOwner) {
+                // For demonstration, using a simple prompt. In a real app, use proper authentication
+                const password = prompt('Enter admin password:');
+                if (password === 'admin123') { // Simple password for demo
+                    localStorage.setItem('isOwner', 'true');
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize page
+        function initPage() {
+            // Load saved profile picture
+            const savedProfilePic = localStorage.getItem('profilePic');
+            if (savedProfilePic) {
+                profilePic.src = savedProfilePic;
+            }
+
+            // Load saved file
+            const savedFileData = localStorage.getItem('fileData');
+            const savedFileName = localStorage.getItem('fileName');
+            if (savedFileData && savedFileName) {
+                uploadedFileData = savedFileData;
+                uploadedFileName = savedFileName;
+                showFileInfo(savedFileName);
+                downloadLink.href = savedFileData;
+                downloadLink.download = savedFileName;
+                downloadLink.style.display = 'inline-block';
+            }
+
+            // Check if user is owner and show admin controls
+            if (checkIfOwner()) {
+                adminToggle.style.display = 'block';
+            } else {
+                // Disable all editing features for non-owners
+                disableEditing();
+            }
+        }
+
+        // Enable editing
+        function enableEditing() {
+            editingEnabled = true;
+            uploadOverlay.style.display = 'flex';
+            fileUploadArea.style.cursor = 'pointer';
+            enableEditBtn.textContent = 'Editing Enabled';
+            enableEditBtn.style.backgroundColor = '#4CAF50';
+        }
+
+        // Disable editing
+        function disableEditing() {
+            editingEnabled = false;
+            uploadOverlay.style.display = 'none';
+            fileUploadArea.style.cursor = 'default';
+            enableEditBtn.textContent = 'Enable Editing';
+            enableEditBtn.style.backgroundColor = '#800020';
+        }
+
+        // Handle profile picture upload
         function handleImageUpload(event) {
+            if (!editingEnabled) return;
+            
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('profilePic').src = e.target.result;
+                    profilePic.src = e.target.result;
+                    // Save to localStorage
+                    localStorage.setItem('profilePic', e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         }
 
+        // Handle document upload
         function handleDocumentUpload(event) {
+            if (!editingEnabled) return;
+            
             const file = event.target.files[0];
             if (file) {
                 uploadedFileName = file.name;
@@ -564,12 +713,18 @@ Tackle personalized doubts</div>
                 reader.onload = function(e) {
                     uploadedFileData = e.target.result;
                     showFileInfo(file.name);
+                    // Save to localStorage
+                    localStorage.setItem('fileData', e.target.result);
+                    localStorage.setItem('fileName', file.name);
                 };
                 reader.readAsDataURL(file);
             }
         }
 
+        // Handle file drop
         function handleFileDrop(event) {
+            if (!editingEnabled) return;
+            
             event.preventDefault();
             event.stopPropagation();
             
@@ -585,37 +740,86 @@ Tackle personalized doubts</div>
                     reader.onload = function(e) {
                         uploadedFileData = e.target.result;
                         showFileInfo(file.name);
+                        // Save to localStorage
+                        localStorage.setItem('fileData', e.target.result);
+                        localStorage.setItem('fileName', file.name);
                     };
                     reader.readAsDataURL(file);
                 }
             }
         }
 
-        function handleDragOver(event) {
-            event.preventDefault();
-            event.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(event) {
-            event.currentTarget.classList.remove('dragover');
-        }
-
+        // Show file info
         function showFileInfo(fileName) {
-            const fileInfo = document.getElementById('fileInfo');
-            const fileNameDiv = document.getElementById('fileName');
-            const downloadLink = document.getElementById('downloadLink');
-            
-            fileNameDiv.textContent = `📁 Uploaded: ${fileName}`;
+            fileName.textContent = `📁 Uploaded: ${fileName}`;
             downloadLink.href = uploadedFileData;
             downloadLink.download = fileName;
             downloadLink.style.display = 'inline-block';
-            fileInfo.style.display = 'block';
         }
 
-        // Make the profile picture clickable
-        document.getElementById('profilePic').addEventListener('click', function() {
-            document.getElementById('fileInput').click();
+        // Reset to default
+        function resetToDefault() {
+            if (confirm('Are you sure you want to reset? This will remove all uploaded files.')) {
+                localStorage.removeItem('profilePic');
+                localStorage.removeItem('fileData');
+                localStorage.removeItem('fileName');
+                
+                // Reset profile picture
+                profilePic.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiByeD0iNzUiIGZpbGw9IiNlMGRkZDgiLz4KPHN2ZyB4PSI0NSIgeT0iNDAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI3MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTk5Ij4KICA8cGF0aCBkPSJNMTIgMTJcbiAgICBjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCAxLjc5LTQgNCAxLjc5IDQgNCA0eiIgLz4KICA8cGF0aCBkPSJNMTIgMTVjLTMuMzEgMC02IDIuNjktNiA2aDEyYzAtMy4zMS0yLjY5LTYtNi02eiIgLz4KPC9zdmc+Cg==";
+                
+                // Reset file info
+                fileName.textContent = "No file uploaded yet";
+                downloadLink.style.display = "none";
+                uploadedFileData = null;
+                uploadedFileName = '';
+                
+                disableEditing();
+            }
+        }
+
+        // Event Listeners
+        fileInput.addEventListener('change', handleImageUpload);
+        uploadOverlay.addEventListener('click', () => {
+            if (editingEnabled) fileInput.click();
         });
+
+        documentUpload.addEventListener('change', handleDocumentUpload);
+        fileUploadArea.addEventListener('click', () => {
+            if (editingEnabled) documentUpload.click();
+        });
+        fileUploadArea.addEventListener('drop', handleFileDrop);
+        fileUploadArea.addEventListener('dragover', (e) => {
+            if (editingEnabled) {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            }
+        });
+        fileUploadArea.addEventListener('dragleave', (e) => {
+            e.currentTarget.classList.remove('dragover');
+        });
+
+        adminToggle.addEventListener('click', () => {
+            adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+        });
+
+        enableEditBtn.addEventListener('click', () => {
+            if (editingEnabled) {
+                disableEditing();
+            } else {
+                enableEditing();
+            }
+        });
+
+        saveChangesBtn.addEventListener('click', () => {
+            disableEditing();
+            adminPanel.style.display = 'none';
+            alert('Changes saved successfully!');
+        });
+
+        resetBtn.addEventListener('click', resetToDefault);
+
+        // Initialize the page
+        initPage();
     </script>
 </body>
 </html>
