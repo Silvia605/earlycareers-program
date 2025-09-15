@@ -288,6 +288,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 1000;
             display: none;
+            width: 300px;
         }
 
         .admin-toggle {
@@ -324,6 +325,119 @@
 
         .admin-btn.reset {
             background: #d9534f;
+        }
+        
+        /* Password Modal Styles */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .password-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .password-title {
+            margin-bottom: 20px;
+            color: #800020;
+            text-align: center;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .password-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #800020;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .password-error {
+            color: #d9534f;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* Analytics Tab Styles */
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .admin-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            background: #f1f1f1;
+            border: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        
+        .admin-tab.active {
+            background: #800020;
+            color: white;
+        }
+        
+        .analytics-section {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .analytics-section.active {
+            display: block;
+        }
+        
+        .analytics-metric {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .metric-title {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            color: #800020;
+            margin: 5px 0;
+        }
+        
+        .metric-description {
+            font-size: 14px;
+            color: #666;
         }
 
         @media (max-width: 768px) {
@@ -382,6 +496,7 @@
                 top: 70px;
                 right: 10px;
                 left: 10px;
+                width: auto;
             }
         }
     </style>
@@ -410,10 +525,10 @@
             <h2 class="section-title">Contact Details</h2>
             <div class="contact-grid">
                 <span class="contact-label">📧 Email:</span>
-                <a href="mailto:silvia.gonbla@gmail.com" class="contact-link">silvia.gonbla@gmail.com</a>
+                <a href="mailto:silvia.gonbla@gmail.com" class="contact-link" id="emailLink">silvia.gonbla@gmail.com</a>
                 
                 <span class="contact-label">📅 Calendly:</span>
-                <a href="https://calendly.com/silvs-mentorship" target="_blank" class="contact-link">calendly.com/silvs-mentorship</a>
+                <a href="https://calendly.com/silvs-mentorship" target="_blank" class="contact-link" id="calendlyLink">calendly.com/silvs-mentorship</a>
             </div>
         </div>
 
@@ -593,14 +708,56 @@ Tackle personalized doubts</div>
         </div>
     </div>
 
+    <!-- Password Modal -->
+    <div class="password-modal" id="passwordModal">
+        <div class="password-container">
+            <h3 class="password-title">Admin Access</h3>
+            <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">
+            <button class="password-submit" id="passwordSubmit">Submit</button>
+            <p class="password-error" id="passwordError">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
     <!-- Admin Controls -->
     <button class="admin-toggle" id="adminToggle">⚙️</button>
     <div class="admin-panel" id="adminPanel">
-        <h3>Admin Controls</h3>
-        <div class="admin-controls">
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="controls">Controls</button>
+            <button class="admin-tab" data-tab="analytics">Analytics</button>
+        </div>
+        
+        <div id="controlsTab" class="admin-controls">
+            <h3>Admin Controls</h3>
             <button class="admin-btn" id="enableEditBtn">Enable Editing</button>
             <button class="admin-btn" id="saveChangesBtn">Save Changes</button>
             <button class="admin-btn reset" id="resetBtn">Reset to Default</button>
+        </div>
+        
+        <div id="analyticsTab" class="analytics-section">
+            <h3>Analytics</h3>
+            <div class="analytics-metric">
+                <div class="metric-title">Total Page Visits</div>
+                <div class="metric-value" id="totalVisits">0</div>
+                <div class="metric-description">Number of times this page has been visited</div>
+            </div>
+            
+            <div class="analytics-metric">
+                <div class="metric-title">Calendly Link Clicks</div>
+                <div class="metric-value" id="calendlyClicks">0</div>
+                <div class="metric-description">Number of clicks on the Calendly scheduling link</div>
+            </div>
+            
+            <div class="analytics-metric">
+                <div class="metric-title">File Downloads</div>
+                <div class="metric-value" id="downloadClicks">0</div>
+                <div class="metric-description">Number of times the file has been downloaded</div>
+            </div>
+            
+            <div class="analytics-metric">
+                <div class="metric-title">Email Link Clicks</div>
+                <div class="metric-value" id="emailClicks">0</div>
+                <div class="metric-description">Number of clicks on the email address</div>
+            </div>
         </div>
     </div>
 
@@ -618,11 +775,26 @@ Tackle personalized doubts</div>
         const enableEditBtn = document.getElementById('enableEditBtn');
         const saveChangesBtn = document.getElementById('saveChangesBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const passwordModal = document.getElementById('passwordModal');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordSubmit = document.getElementById('passwordSubmit');
+        const passwordError = document.getElementById('passwordError');
+        const calendlyLink = document.getElementById('calendlyLink');
+        const emailLink = document.getElementById('emailLink');
+        const adminTabs = document.querySelectorAll('.admin-tab');
+        const controlsTab = document.getElementById('controlsTab');
+        const analyticsTab = document.getElementById('analyticsTab');
+        const totalVisitsEl = document.getElementById('totalVisits');
+        const calendlyClicksEl = document.getElementById('calendlyClicks');
+        const downloadClicksEl = document.getElementById('downloadClicks');
+        const emailClicksEl = document.getElementById('emailClicks');
 
         // State
         let editingEnabled = false;
         let uploadedFileData = null;
         let uploadedFileName = '';
+        let isAuthenticated = false;
+        const ADMIN_PASSWORD = "mentor123"; // Change this to your desired password
 
         // Initialize page
         function initPage() {
@@ -639,8 +811,62 @@ Tackle personalized doubts</div>
                 downloadLink.style.display = 'inline-block';
             }
 
-            // Show admin controls
+            // Initialize analytics
+            initAnalytics();
+            
+            // Show admin toggle
             adminToggle.style.display = 'block';
+        }
+
+        // Initialize analytics tracking
+        function initAnalytics() {
+            // Initialize counts if they don't exist
+            if (!localStorage.getItem('totalVisits')) {
+                localStorage.setItem('totalVisits', '0');
+            }
+            if (!localStorage.getItem('calendlyClicks')) {
+                localStorage.setItem('calendlyClicks', '0');
+            }
+            if (!localStorage.getItem('downloadClicks')) {
+                localStorage.setItem('downloadClicks', '0');
+            }
+            if (!localStorage.getItem('emailClicks')) {
+                localStorage.setItem('emailClicks', '0');
+            }
+            
+            // Increment page visit count
+            const visits = parseInt(localStorage.getItem('totalVisits')) + 1;
+            localStorage.setItem('totalVisits', visits.toString());
+            
+            // Update analytics display
+            updateAnalyticsDisplay();
+            
+            // Add click tracking to links
+            calendlyLink.addEventListener('click', () => {
+                const clicks = parseInt(localStorage.getItem('calendlyClicks')) + 1;
+                localStorage.setItem('calendlyClicks', clicks.toString());
+                updateAnalyticsDisplay();
+            });
+            
+            emailLink.addEventListener('click', () => {
+                const clicks = parseInt(localStorage.getItem('emailClicks')) + 1;
+                localStorage.setItem('emailClicks', clicks.toString());
+                updateAnalyticsDisplay();
+            });
+            
+            downloadLink.addEventListener('click', () => {
+                const clicks = parseInt(localStorage.getItem('downloadClicks')) + 1;
+                localStorage.setItem('downloadClicks', clicks.toString());
+                updateAnalyticsDisplay();
+            });
+        }
+        
+        // Update analytics display
+        function updateAnalyticsDisplay() {
+            totalVisitsEl.textContent = localStorage.getItem('totalVisits');
+            calendlyClicksEl.textContent = localStorage.getItem('calendlyClicks');
+            downloadClicksEl.textContent = localStorage.getItem('downloadClicks');
+            emailClicksEl.textContent = localStorage.getItem('emailClicks');
         }
 
         // Enable editing
@@ -745,6 +971,40 @@ Tackle personalized doubts</div>
                 disableEditing();
             }
         }
+        
+        // Check password
+        function checkPassword() {
+            if (passwordInput.value === ADMIN_PASSWORD) {
+                isAuthenticated = true;
+                passwordModal.style.display = 'none';
+                adminPanel.style.display = 'block';
+            } else {
+                passwordError.style.display = 'block';
+                passwordInput.value = '';
+            }
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            adminTabs.forEach(tab => {
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Update tab content
+            if (tabName === 'controls') {
+                controlsTab.style.display = 'block';
+                analyticsTab.style.display = 'none';
+            } else if (tabName === 'analytics') {
+                controlsTab.style.display = 'none';
+                analyticsTab.style.display = 'block';
+                updateAnalyticsDisplay();
+            }
+        }
 
         // Event Listeners
         fileInput.addEventListener('change', handleImageUpload);
@@ -768,7 +1028,19 @@ Tackle personalized doubts</div>
         });
 
         adminToggle.addEventListener('click', () => {
-            adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+            if (isAuthenticated) {
+                adminPanel.style.display = adminPanel.style.display === 'block' ? 'none' : 'block';
+            } else {
+                passwordModal.style.display = 'flex';
+                passwordInput.focus();
+            }
+        });
+
+        passwordSubmit.addEventListener('click', checkPassword);
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
         });
 
         enableEditBtn.addEventListener('click', () => {
@@ -786,6 +1058,13 @@ Tackle personalized doubts</div>
         });
 
         resetBtn.addEventListener('click', resetToDefault);
+        
+        // Tab switching
+        adminTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
 
         // Initialize the page
         initPage();
